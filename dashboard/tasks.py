@@ -6,23 +6,23 @@ from config.settings import logger
 
 @app.task
 def update_last_price():
+    """Обновляет текущую цену и направление тренда для всех акций."""
     shares = Share.objects.all()
 
     for share in shares:
         try:
-            [last_price, detetime] = get_last_data(share)
+            last_price, _ = get_last_data(share)
 
-            try:
-                if share.last_price > last_price:
-                    is_trend_high = False
-                else:
-                    is_trend_high = True
-            except Exception as e:
-                logger.error(e)
+            # Определяем тренд только если предыдущая цена уже известна
+            if share.last_price is not None:
+                is_trend_high = last_price >= share.last_price
+            else:
+                # Первая инициализация — считаем ростом
                 is_trend_high = True
 
             Share.objects.filter(id=share.id).update(
-                last_price=last_price, is_trend_high=is_trend_high
+                last_price=last_price,
+                is_trend_high=is_trend_high,
             )
-        except Exception as e:
-            logger.error(e)
+        except Exception:
+            logger.exception("Ошибка обновления цены для share id=%s", share.id)

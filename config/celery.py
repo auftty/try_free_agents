@@ -5,13 +5,12 @@ from celery import Celery
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 
 app = Celery("config")
-
 app.config_from_object("django.conf:settings", namespace="CELERY")
-
 app.autodiscover_tasks()
 
+# Scheduled tasks – update share prices every 10 seconds
 app.conf.beat_schedule = {
-    "add-every-5-min": {
+    "update-share-prices": {
         "task": "dashboard.tasks.update_last_price",
         "schedule": 10.0,
     },

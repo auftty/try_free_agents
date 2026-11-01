@@ -10,27 +10,29 @@ class AuthView(View):
 
     @staticmethod
     def get(request):
-        return render(request, "user/auth.html", {"form": AuthForm})
+        return render(request, "user/auth.html", {"form": AuthForm()})
 
     @staticmethod
     def post(request):
         form = AuthForm(request.POST)
         user = authenticate(
-            request, username=form.data["email"].lower(), password=form.data["password"]
+            request,
+            username=form.data.get("email", "").lower(),
+            password=form.data.get("password", ""),
         )
 
         if user is not None:
             login(request, user)
             return redirect("dashboard:index")
-        else:
-            return render(
-                request,
-                "user/auth.html",
-                {
-                    "form": form,
-                    "error": "Неверный логин или пароль! Повторите попытку.",
-                },
-            )
+
+        return render(
+            request,
+            "user/auth.html",
+            {
+                "form": form,
+                "error": "Неверный логин или пароль! Повторите попытку.",
+            },
+        )
 
 
 class RegistrationView(View):
@@ -38,7 +40,7 @@ class RegistrationView(View):
 
     @staticmethod
     def get(request):
-        return render(request, "user/registration.html", {"form": RegistrationForm})
+        return render(request, "user/registration.html", {"form": RegistrationForm()})
 
     @staticmethod
     def post(request):
@@ -47,12 +49,12 @@ class RegistrationView(View):
             user = form.save()
             login(request, user)
             return redirect("dashboard:index")
-        else:
-            return render(
-                request,
-                "user/registration.html",
-                {"form": form, "error": form.errors["__all__"].data[0].message},
-            )
+
+        return render(
+            request,
+            "user/registration.html",
+            {"form": form, "error": form.errors.as_text()},
+        )
 
 
 class LogoutView(View):
