@@ -14,9 +14,12 @@ class ShareFilter(filters.FilterSet):
 
 
 class ShareViewSet(viewsets.ModelViewSet):
+    """CRUD API для акций."""
+
     serializer_class = ShareSerializer
     queryset = Share.objects.all()
     filter_backends = (OrderingFilter, filters.DjangoFilterBackend, SearchFilter)
     filterset_class = ShareFilter
     ordering_fields = ["name", "ticker"]
+    ordering = ["name"]
     search_fields = ["$name"]

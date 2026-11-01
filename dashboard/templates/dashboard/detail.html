@@ -1,32 +1,42 @@
 {% extends "dashboard/base.html" %}
 
 {% block title %}
-<title>Детальная информация</title>
+    <title>Детальная информация</title>
 {% endblock %}
 
 {% block content %}
     <div class="row">
-    <div class="col3"></div>
-    <div class="col3">
-        Инструмент: {{ share.name }} <br>
-        Текущая цена: {{ share.last_price }} {{ share.currency }} <br>
-        Время последнего обновления: {{ share.updated_at }}
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h1 class="h4 mb-0">{{ share.name }}</h1>
+                <a href="{% url 'dashboard:history' share.id %}" class="btn btn-outline-primary">
+                    История цен
+                </a>
+            </div>
+            <p>
+                Тикер: <b>{{ share.ticker }}</b><br>
+                Текущая цена:
+                {% if share.last_price is not None %}
+                    {{ share.last_price }} {{ share.currency }}
+                {% else %}
+                    нет данных
+                {% endif %}<br>
+                Время последнего обновления: {{ share.updated_at|default:"—" }}
+            </p>
+        </div>
     </div>
-    <div class="col3"></div>
+
+    <div class="row mt-3">
+        <div class="col-12">
+            <h5>График Tinkoff за 180 дней</h5>
+            {% if plot_div %}
+                {{ plot_div|safe }}
+            {% else %}
+                <div class="alert alert-secondary">
+                    График недоступен: проверьте настройку TINKOFF_TOKEN и доступность
+                    Tinkoff Invest API.
+                </div>
+            {% endif %}
+        </div>
     </div>
-
-
-      <div class="row mt-3">
-    <div class="col3"></div>
-    <div class="col3">
-    <h5>Исторические данные: </h5>
- {% autoescape off %}
-  {{ plot_div }}
-  {% endautoescape %}
-    </div>
-    <div class="col3"></div>
-    </div>
-
-
-
 {% endblock %}

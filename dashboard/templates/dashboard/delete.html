@@ -5,11 +5,12 @@
 {% endblock %}
 
 {% block content %}
+    <h1 class="h4 mb-3">Удаление инструмента</h1>
 
     <form method="post">
         {% csrf_token %}
-        <p>Вы уверены, что хотите удалить инструмент: <b>"{{ share.name }}"</b> ?</p>
-        <input type="submit" class="btn btn-sm btn-outline-danger rounded-pill" value="Удалить" />
+        <p>Вы уверены, что хотите удалить инструмент: <b>"{{ share.name }}"</b>?</p>
+        <button type="submit" class="btn btn-danger">Удалить</button>
+        <a href="{% url 'dashboard:index' %}" class="btn btn-outline-secondary">Отмена</a>
     </form>
-
 {% endblock %}

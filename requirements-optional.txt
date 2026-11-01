@@ -1,0 +1,11 @@
+# Tinkoff Invest SDK is not installable from PyPI anymore (the project is in
+# quarantine). Install it separately from the official repository:
+#
+#   pip install --no-deps "git+https://github.com/RussianInvestments/invest-python.git@fcf0af1e27f053cd4bc75eb20863ece23a202d47"
+#
+# Then install the runtime dependencies required by the SDK:
+grpcio==1.85.1
+protobuf==5.29.6
+cachetools==5.5.2
+deprecation==2.1.0
+python-dateutil==2.9.0.post0

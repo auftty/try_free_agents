@@ -1,23 +1,22 @@
 {% extends "dashboard/base.html" %}
 
 {% block title %}
-<title>Добавить инструмент</title>
+    <title>Добавить инструмент</title>
 {% endblock %}
 
 {% block content %}
-{% load crispy_forms_tags %}
-<div class="row">
-    <div class="col-4"></div>
-    <div class="col-4">
-
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {% for field in form %}
-            {{ field|as_crispy_field }}
-            {% endfor %}
-            <button class="w-100 btn btn-lg btn-primary mt-5" type="submit">Сохранить</button>
-        </form>
+    {% load crispy_forms_tags %}
+    <div class="row">
+        <div class="col-lg-6 offset-lg-3">
+            <h1 class="h4 mb-3">Добавить инструмент</h1>
+            <form method="post">
+                {% csrf_token %}
+                {% for field in form %}
+                    {{ field|as_crispy_field }}
+                {% endfor %}
+                <button class="btn btn-lg btn-primary mt-4" type="submit">Сохранить</button>
+                <a href="{% url 'dashboard:index' %}" class="btn btn-lg btn-outline-secondary mt-4">Отмена</a>
+            </form>
+        </div>
     </div>
-    <div class="col-4"></div>
-</div>
 {% endblock %}

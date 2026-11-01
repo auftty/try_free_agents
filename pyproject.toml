@@ -1,0 +1,15 @@
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+extend-exclude = [".venv", "migrations"]
+
+[tool.ruff.lint]
+# Django/DRF views declare mutable class-level settings (ordering, filters),
+# which are intentionally shared and not modified at runtime.
+ignore = ["RUF012"]
+
+[tool.ruff.lint.per-file-ignores]
+# External API and ORM boundaries: failures of individual instruments or of
+# the remote service must not leak arbitrary vendor exceptions to the user.
+"dashboard/services/graph.py" = ["BLE001"]
+"dashboard/management/commands/add_shares.py" = ["BLE001"]

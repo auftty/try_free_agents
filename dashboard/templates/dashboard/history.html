@@ -1,0 +1,110 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}
+    <title>История цен — {{ share.ticker }}</title>
+{% endblock %}
+
+{% block content %}
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+        <div>
+            <h1 class="h4 mb-1">
+                {{ share.name }}
+                <span class="text-muted">({{ share.ticker }})</span>
+            </h1>
+            <p class="text-muted mb-0">
+                История рыночных цен, накопленная приложением.
+            </p>
+        </div>
+        <a href="{% url 'dashboard:detail' share.id %}" class="btn btn-outline-secondary">
+            К акции
+        </a>
+    </div>
+
+    <div class="btn-group my-3" role="group" aria-label="Период истории">
+        {% for value, label in period_choices %}
+            <a href="?days={{ value }}"
+               class="btn btn-outline-primary{% if value == days %} active{% endif %}">
+                {{ label }}
+            </a>
+        {% endfor %}
+    </div>
+
+    {% if statistics.count %}
+        <div class="row row-cols-2 row-cols-md-5 g-2 mb-3">
+            <div class="col">
+                <div class="border rounded p-2 h-100">
+                    <div class="text-muted small">Точек</div>
+                    <div class="fw-bold">{{ statistics.count }}</div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="border rounded p-2 h-100">
+                    <div class="text-muted small">Первая цена</div>
+                    <div class="fw-bold">{{ statistics.first_price|floatformat:4 }} {{ share.currency }}</div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="border rounded p-2 h-100">
+                    <div class="text-muted small">Последняя цена</div>
+                    <div class="fw-bold">{{ statistics.last_price|floatformat:4 }} {{ share.currency }}</div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="border rounded p-2 h-100">
+                    <div class="text-muted small">Минимум</div>
+                    <div class="fw-bold">{{ statistics.min_price|floatformat:4 }} {{ share.currency }}</div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="border rounded p-2 h-100">
+                    <div class="text-muted small">Максимум</div>
+                    <div class="fw-bold">{{ statistics.max_price|floatformat:4 }} {{ share.currency }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert {% if statistics.change_abs > 0 %}alert-success{% elif statistics.change_abs < 0 %}alert-danger{% else %}alert-secondary{% endif %}">
+            Изменение за период:
+            <b>
+                {% if statistics.change_abs > 0 %}+{% endif %}{{ statistics.change_abs|floatformat:4 }} {{ share.currency }}
+            </b>
+            {% if statistics.change_percent is not None %}
+                ({% if statistics.change_percent > 0 %}+{% endif %}{{ statistics.change_percent|floatformat:2 }}%)
+            {% else %}
+                (процент не рассчитывается: первая цена равна нулю)
+            {% endif %}
+        </div>
+
+        <div class="mb-4">
+            {{ plot_div|safe }}
+        </div>
+
+        <h5>Последние снимки</h5>
+        <table class="table table-sm table-striped align-middle">
+            <thead>
+            <tr>
+                <th scope="col">Время котировки</th>
+                <th scope="col">Цена</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for record in recent_records %}
+                <tr>
+                    <td>{{ record.quoted_at|date:"d.m.Y H:i" }}</td>
+                    <td>{{ record.price|floatformat:4 }} {{ share.currency }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <p class="text-muted small">
+            Показаны 20 последних снимков за выбранный период.
+        </p>
+    {% else %}
+        <div class="alert alert-secondary">
+            За выбранный период накопленных данных нет. Снимки создаются
+            автоматически при обновлении цен (задача Celery
+            <code>update_last_price</code>); для загрузки справочника и проверки
+            API нужен настроенный <code>TINKOFF_TOKEN</code>.
+        </div>
+    {% endif %}
+{% endblock %}
